@@ -95,14 +95,14 @@ private:
     static void updateCoefficients(Coefficients& old, const Coefficients& replacements);
 
     template<typename ChainType, typename CoefficientType>
-    void updateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficient, const ChainSettings& chainSettings)
+    void updateCutFilter(ChainType& leftLowCut, const CoefficientType& cutCoefficient, const Slope& lowCutSlope)
     {
         leftLowCut.template setBypassed<0>(true);
         leftLowCut.template setBypassed<1>(true);
         leftLowCut.template setBypassed<2>(true);
         leftLowCut.template setBypassed<3>(true);
 
-        switch (chainSettings.lowCutSlope) {
+        switch (lowCutSlope) {
         case Slope_12:
         {
             *leftLowCut.template get<0>().coefficients = *cutCoefficient[0];
