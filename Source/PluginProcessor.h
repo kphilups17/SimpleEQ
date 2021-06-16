@@ -27,6 +27,18 @@ struct ChainSettings
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
+
+using Filter = juce::dsp::IIR::Filter<float>;
+using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+enum ChainPosistions
+{
+    LowCut,
+    Peak,
+    HighCut
+};
+
 //==============================================================================
 /**
 */
@@ -36,6 +48,9 @@ public:
     //==============================================================================
     SimpleEQAudioProcessor();
     ~SimpleEQAudioProcessor() override;
+     
+
+    
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -76,18 +91,8 @@ public:
 private:
 
 
-    using Filter = juce::dsp::IIR::Filter<float>;
-    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
-    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
     
     MonoChain leftChain, rightChain;
-
-    enum ChainPosistions
-    {
-        LowCut,
-        Peak,
-        HighCut
-    };
 
     void updatePeakFilter(const ChainSettings& chainSettings);
     using Coefficients = Filter::CoefficientsPtr;
