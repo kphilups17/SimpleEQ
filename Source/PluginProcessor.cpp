@@ -173,16 +173,16 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     updatePeakFilter(chainSettings);
 
+    //get low cut coefficients
     auto cutCoefficient = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(chainSettings.lowCutFreq,
         getSampleRate(),
         2 * (chainSettings.lowCutSlope + 1)
     );
+
+    //apply low cut coefficients to right and left chain
     auto& leftLowCut = leftChain.get<ChainPosistions::LowCut>();
-
     updateCutFilter(leftLowCut, cutCoefficient, chainSettings.lowCutSlope);
-    
     auto& rightLowCut = rightChain.get<ChainPosistions::LowCut>();
-
     updateCutFilter(rightLowCut, cutCoefficient, chainSettings.lowCutSlope);
 
     juce::dsp::AudioBlock<float> block(buffer);
