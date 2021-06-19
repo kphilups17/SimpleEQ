@@ -149,7 +149,7 @@ juce::String RotarySliderWithLabels::getDisplayString() const
         str << " "; 
         if (addK)
         {
-            str << "K";
+            str << "k";
         }
         str << suffix; 
     }
@@ -334,9 +334,9 @@ void ResponseCurveComponent::resized()
     
     Array<float> freqs
     {
-        20, 30, 40, 50, 100,
-        200, 300, 400, 500, 1000,
-        2000, 3000, 4000, 5000, 10000,
+        20, 50, 100,
+        200, 500, 1000,
+        2000, 5000, 10000,
         20000
     };
     
@@ -364,8 +364,36 @@ void ResponseCurveComponent::resized()
 
     }
 
-    //g.drawRect(getAnalysisArea());
+    g.setColour(Colours::lightgrey);
+    const int fontHeight = 10; 
+    g.setFont(fontHeight); 
 
+    for (int i = 0; i < freqs.size(); i++) {
+        auto f = freqs[i];
+        auto x = xs[i]; 
+
+        bool addK = false; 
+        String str; 
+        if (f > 999) {
+            addK = true; 
+            f /= 1000.f; 
+            
+        }
+        
+        str << f; 
+        if (addK)
+        {
+            str << "k";
+        }
+        str << "Hz"; 
+
+        auto textWidth = g.getCurrentFont().getStringWidth(str); 
+        Rectangle<int> r; 
+        r.setSize(textWidth, fontHeight);
+        r.setCentre(x, 0);
+        r.setY(1);   
+        g.drawFittedText(str, r, juce::Justification::centred, 1); 
+    }
 }
 
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
@@ -411,11 +439,11 @@ SimpleEQAudioProcessorEditor::SimpleEQAudioProcessorEditor (SimpleEQAudioProcess
     
 {   
     peakFreqSlider.labels.add({ 0.f, "20Hz" });
-    peakFreqSlider.labels.add({ 1.f, "20KHz" });
+    peakFreqSlider.labels.add({ 1.f, "20kHz" });
     lowCutFreqSlider.labels.add({ 0.f, "20Hz" });
-    lowCutFreqSlider.labels.add({ 1.f, "20KHz" });
+    lowCutFreqSlider.labels.add({ 1.f, "20kHz" });
     highCutFreqSlider.labels.add({ 0.f, "20Hz" });
-    highCutFreqSlider.labels.add({ 1.f, "20KHz" });
+    highCutFreqSlider.labels.add({ 1.f, "20kHz" });
     peakGainSlider.labels.add({ 0.f, "-24Db" });
     peakGainSlider.labels.add({ 1.f, "24Db" });
     peakQualitySlider.labels.add({ 0.f, "0.0" });
