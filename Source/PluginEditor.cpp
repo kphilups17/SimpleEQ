@@ -14,7 +14,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
                                         float sliderPosProportional,
                                         float rotaryStartAngle,
                                         float rotaryEndAngle,
-                                        juce::Slider&)
+                                        juce::Slider& slider)
 {
     using namespace juce;
     auto bounds = Rectangle<float>(x, y, width, height);
@@ -24,26 +24,42 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g,
     g.setColour(Colour(200u, 123u, 1u));
     g.drawEllipse(bounds, 1.f);
 
-    auto center = bounds.getCentre();
-
-    Path p; 
-
-    Rectangle<float> r;
-    r.setLeft(center.getX() - 2);
-    r.setRight(center.getX() + 2);
-    r.setTop(bounds.getY());
-    r.setBottom(center.getY());
-
-    p.addRectangle(r);
-
-    jassert(rotaryStartAngle < rotaryEndAngle);
-
-    auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle);
-
-    p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
-
-    g.fillPath(p);
-
+    if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
+    {
+        auto center = bounds.getCentre();
+        Path p;
+        
+        Rectangle<float> r; 
+        r.setLeft(center.getX() - 2);
+        r.setRight(center.getX() + 2); 
+        r.setTop(bounds.getY());
+        r.setBottom(center.getY() - rswl->getTextHeight() * 1.5);
+    
+        p.addRoundedRectangle(r, 2.f);
+    
+        jassert(rotaryStartAngle < rotaryEndAngle);
+    
+        auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle);
+    
+        p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY()));
+    
+        g.fillPath(p);
+    
+        g.setFont(rswl->getTextHeight());
+        auto text = rswl->getDisplayString();
+        auto strWidth = g.getCurrentFont().getStringWidth(text);
+    
+        r.setSize(strWidth + 4, rswl->getTextHeight() + 2);
+    
+        r.setCentre(center);
+    
+        g.setColour(Colours::black);
+        g.fillRect(r);
+    
+        g.setColour(Colours::white);
+        g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+    
+    }
 }
 void RotarySliderWithLabels::paint(juce::Graphics& g) 
 {
@@ -56,16 +72,59 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
     auto sliderBounds = getSliderBounds();
 
-    g.setColour(Colours::red);
-    g.drawRect(getLocalBounds());
-    g.setColour(Colours::yellow);
-    g.drawRect(sliderBounds);
+    //g.setColour(Colours::red);
+    //g.drawRect(getLocalBounds());
+    //g.setColour(Colours::yellow);
+    //g.drawRect(sliderBounds);
 
 
     getLookAndFeel().drawRotarySlider(g, sliderBounds.getX(), sliderBounds.getY(), sliderBounds.getWidth(), sliderBounds.getHeight(), 
                                          jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), 
                                          startAng, endAng, 
                                          *this);
+}
+
+juce::String RotarySliderWithLabels::getDisplayString() const
+{
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(param))
+    {
+        return choiceParam->getCurrentChoiceName();
+    }
+
+    juce::String str; 
+    bool addK = false; 
+
+    if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param)) 
+    {
+        float val = getValue();
+        if (val > 999)
+        {
+            val /= 1000.f;
+            addK = true; 
+        }
+
+        if (addK) 
+        {
+            str = juce::String(val, 2);
+        }
+        else
+        {
+            str = juce::String(val, 0);
+        }
+    }
+    else 
+    {
+        jassertfalse; //shouldn't happen
+    }
+    if (suffix.isNotEmpty()) {
+        str << " "; 
+        if (addK)
+        {
+            str << "K";
+        }
+        str << suffix; 
+    }
+    return str;
 }
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
