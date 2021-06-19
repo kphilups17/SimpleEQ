@@ -183,7 +183,7 @@ ResponseCurveComponent::ResponseCurveComponent(SimpleEQAudioProcessor& p) :
 
     leftChannelFFTDataGenerator.changeOrder(FFTOrder::order2048);
 
-    monoBuffer.setSize(, leftChannelFFTDataGenerator.getFFTSize());
+    monoBuffer.setSize(1, leftChannelFFTDataGenerator.getFFTSize());
     updateChain(); 
 
     startTimerHz(60);
@@ -366,7 +366,8 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
 
-    g.setColour(Colours::blue);
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY())); 
+    g.setColour(Colours::skyblue);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1));
 
     g.setColour(Colours::orange);
