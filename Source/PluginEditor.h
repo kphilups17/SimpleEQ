@@ -71,6 +71,7 @@ struct ResponseCurveComponent : public juce::Component,
     void timerCallback() override;
 
     void paint(juce::Graphics&) override;
+    void resized() override; 
 
     juce::Atomic<bool> parametersChanged{ false };
 
@@ -78,6 +79,11 @@ struct ResponseCurveComponent : public juce::Component,
 
 private:
     SimpleEQAudioProcessor& audioProcessor;
+
+    juce::Image background; 
+
+    juce::Rectangle<int> getRenderArea(); 
+    juce::Rectangle<int> getAnalysisArea();
 };
 //==============================================================================
 /**
