@@ -3,6 +3,8 @@
 
     This file contains the basic framework code for a JUCE plugin editor.
 
+    Used for Visual Elements of plugin
+
   ==============================================================================
 */
 
