@@ -71,6 +71,9 @@ struct ResponseCurveComponent : juce::Component,
 
     void paint(juce::Graphics& g) override;
 
+    // called whenever bounds of the window change and before the first time that paint is called
+    void resized() override; 
+
 
 private:
     SimpleEQAudioProcessor& audioProcessor;
@@ -80,6 +83,11 @@ private:
     MonoChain monoChain;
 
     void updateChain();
+
+    juce::Image background; 
+
+    juce::Rectangle<int> getRenderArea();
+    juce::Rectangle<int> getAnalysisArea();
 };
 
 //==============================================================================
