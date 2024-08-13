@@ -257,6 +257,9 @@ struct ResponseCurveComponent : juce::Component,
     // called whenever bounds of the window change and before the first time that paint is called
     void resized() override; 
 
+    void toggleAnalysisEnablement(bool enabled) {
+        shouldShowFFTAnalysis = enabled;
+    }
 
 private:
     SimpleEQAudioProcessor& audioProcessor;
@@ -273,6 +276,8 @@ private:
     juce::Rectangle<int> getAnalysisArea();
 
     PathProducer leftPathProducer, rightPathProducer;
+
+    bool shouldShowFFTAnalysis = true; 
 };
 
 
